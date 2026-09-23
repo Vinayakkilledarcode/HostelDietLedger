@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hostel Diet Ledger</title>
+<style>
+  @font-face { font-family: 'Fraunces'; font-weight: 400; font-style: normal; font-display: swap; src: url('fonts/fraunces-latin-400-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Fraunces'; font-weight: 500; font-style: normal; font-display: swap; src: url('fonts/fraunces-latin-500-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Fraunces'; font-weight: 600; font-style: normal; font-display: swap; src: url('fonts/fraunces-latin-600-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Work Sans'; font-weight: 400; font-style: normal; font-display: swap; src: url('fonts/work-sans-latin-400-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Work Sans'; font-weight: 500; font-style: normal; font-display: swap; src: url('fonts/work-sans-latin-500-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Work Sans'; font-weight: 600; font-style: normal; font-display: swap; src: url('fonts/work-sans-latin-600-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Work Sans'; font-weight: 700; font-style: normal; font-display: swap; src: url('fonts/work-sans-latin-700-normal.woff2') format('woff2'); }
+  :root {
+    --bg: #FAF7F0;
+    --bg-raised: #FFFFFF;
+    --ink: #2B2A26;
+    --ink-soft: #6B6255;
+    --line: #DDD5C3;
+    --spice: #B8791F;
+    --spice-soft: #F3E4C8;
+    --leaf: #4B6B3A;
+    --leaf-soft: #E4EBDD;
+    --rust: #A8462E;
+    --rust-soft: #F3E0D9;
+    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    box-sizing: border-box;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1C1A16;
+      --bg-raised: #262319;
+      --ink: #F1ECE1;
+      --ink-soft: #B3A996;
+      --line: #3C3728;
+      --spice: #E0A94A;
+      --spice-soft: #3A2F17;
+      --leaf: #8FB579;
+      --leaf-soft: #253420;
+      --rust: #E08A6F;
+      --rust-soft: #3A231C;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1C1A16;
+    --bg-raised: #262319;
+    --ink: #F1ECE1;
+    --ink-soft: #B3A996;
+    --line: #3C3728;
+    --spice: #E0A94A;
+    --spice-soft: #3A2F17;
+    --leaf: #8FB579;
+    --leaf-soft: #253420;
+    --rust: #E08A6F;
+    --rust-soft: #3A231C;
+  }
+  * { box-sizing: inherit; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 28px 20px 80px; }
+  header.hero { padding: 20px 0 8px; position: relative; }
+  .theme-btn {
+    position: absolute; top: 20px; right: 0;
+    background: var(--bg-raised); border: 1px solid var(--line);
+    color: var(--ink-soft); border-radius: 999px; width: 36px; height: 36px;
+    font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(32px, 7vw, 46px);
+    line-height: 1.05;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+  .hero p {
+    font-size: 16px;
+    color: var(--ink-soft);
+    max-width: 46ch;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .targets { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  .target-chip {
+    background: var(--bg-raised); border: 1px solid var(--line);
+    border-radius: 10px; padding: 10px 14px;
+  }
+  .target-chip .num { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--spice); display: block; }
+  .target-chip .lbl { font-size: 12.5px; color: var(--ink-soft); }
+
+  .card {
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px;
+    margin-top: 22px;
+  }
+  .card h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 21px;
+    margin: 0 0 6px;
+  }
+  .card .sub { color: var(--ink-soft); font-size: 14px; margin: 0 0 16px; line-height: 1.5; }
+
+  /* Hydration */
+  .bottle-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .bottle {
+    width: 38px; height: 52px; border-radius: 6px 6px 10px 10px;
+    border: 2px solid var(--line); position: relative; cursor: pointer; background: transparent;
+    flex-shrink: 0;
+  }
+  .bottle::before {
+    content: ""; position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+    width: 12px; height: 8px; background: var(--line); border-radius: 2px 2px 0 0;
+  }
+  .bottle.filled { background: var(--spice-soft); border-color: var(--spice); }
+  .bottle.filled::before { background: var(--spice); }
+  .hydration-status { margin-top: 12px; font-size: 14px; color: var(--ink-soft); display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .reset-btn {
+    border: 1px solid var(--line); background: transparent; color: var(--ink-soft);
+    padding: 6px 12px; border-radius: 999px; font-size: 13px; cursor: pointer; font-family: var(--font-body);
+  }
+  .reset-btn:hover { border-color: var(--spice); color: var(--spice); }
+
+  /* Week / day nav */
+  .week-tabs { display: flex; gap: 8px; margin-top: 26px; }
+  .week-tab {
+    flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--bg-raised); color: var(--ink); font-family: var(--font-body);
+    font-size: 14px; font-weight: 600; cursor: pointer; text-align: center;
+  }
+  .week-tab.active { background: var(--spice); border-color: var(--spice); color: #fff; }
+  .day-tabs { display: flex; gap: 6px; margin-top: 12px; overflow-x: auto; padding-bottom: 4px; }
+  .day-tab {
+    flex: 0 0 auto; padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line);
+    background: var(--bg-raised); color: var(--ink-soft); font-family: var(--font-body);
+    font-size: 13.5px; font-weight: 500; cursor: pointer; white-space: nowrap;
+  }
+  .day-tab.active { background: var(--leaf-soft); border-color: var(--leaf); color: var(--leaf); font-weight: 600; }
+
+  /* Day ledger */
+  .day-panel { margin-top: 18px; }
+  .ledger-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+  table.ledger { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 520px; }
+  table.ledger th {
+    text-align: left; font-family: var(--font-body); font-weight: 600; font-size: 12.5px;
+    color: var(--ink-soft); padding: 12px 14px; border-bottom: 1px solid var(--line);
+  }
+  table.ledger th.num, table.ledger td.num { text-align: right; }
+  table.ledger td { padding: 13px 14px; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.45; }
+  table.ledger tr:last-child td { border-bottom: none; }
+  table.ledger td.meal { font-weight: 600; white-space: nowrap; color: var(--ink); }
+  table.ledger td.items { color: var(--ink-soft); }
+  tr.total td { font-weight: 700; background: var(--spice-soft); }
+  tr.total td.num { color: var(--spice); }
+  .badge-row { display: flex; gap: 8px; margin-top: 12px; }
+  .badge {
+    font-size: 12.5px; padding: 6px 12px; border-radius: 999px; font-weight: 600;
+    background: var(--leaf-soft); color: var(--leaf); border: 1px solid var(--leaf);
+  }
+
+  .tips { margin-top: 22px; }
+  .tips ul { margin: 0; padding-left: 20px; color: var(--ink-soft); font-size: 14.5px; line-height: 1.7; }
+  .tips li { margin-bottom: 4px; }
+  .note { font-size: 13px; color: var(--ink-soft); line-height: 1.6; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); }
+
+  @media (max-width: 420px) {
+    .targets { gap: 8px; }
+    .target-chip { padding: 8px 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">◐</button>
+    <h1>Hostel Diet Ledger</h1>
+    <p>Your VIT mess menu, mapped meal-by-meal to a daily target — built around the Pintola oats and MyFitness peanut butter you keep on hand.</p>
+    <div class="targets">
+      <div class="target-chip"><span class="num">≤2,000</span><span class="lbl">kcal / day</span></div>
+      <div class="target-chip"><span class="num">≥70 g</span><span class="lbl">protein / day</span></div>
+      <div class="target-chip"><span class="num">~3.6 L</span><span class="lbl">water / day (7×515 ml)</span></div>
+    </div>
+  </header>
+
+  <div class="card">
+    <h2>Water for today</h2>
+    <p class="sub">About 7 bottles (~3.6 L) on top of the buttermilk, rasam and curd you're already getting at the mess — a bit above the usual 2.5–3 L baseline since you're eating/training on a calorie deficit. Water itself doesn't "burn fat," but staying well-hydrated keeps digestion (including breaking down the protein in your dal, curd and paneer) and metabolism running normally, and drinking a glass before meals is a real, evidence-backed way to curb overeating rice or fried snacks. Tap a bottle as you finish it.</p>
+    <div class="bottle-row" id="bottleRow"></div>
+    <div class="hydration-status">
+      <span id="bottleStatus">0 / 7 bottles</span>
+      <button class="reset-btn" id="resetBottles">Reset for tomorrow</button>
+    </div>
+  </div>
+
+  <div class="week-tabs" id="weekTabs"></div>
+  <div class="day-tabs" id="dayTabs"></div>
+  <div class="day-panel" id="dayPanel"></div>
+
+  <div class="card tips">
+    <h2>Running rules</h2>
+    <ul>
+      <li>One fried item a day, max — cutlet, samosa, poori, bonda or vada, pick one, not the full count offered.</li>
+      <li>Rice: one small serving (⅓–½ cup) per meal — let phulka/roti carry the rest of the carbs.</li>
+      <li>Refill dal, sambar, rasam, curd and buttermilk freely — they're doing most of the protein and volume work here.</li>
+      <li>Sweets and milkshakes: skip on most days, half portion on the days you really want it.</li>
+      <li>Oats + peanut butter is fixed daily — 40 g Pintola oats with water, stirred with 1 tbsp (15 g) MyFitness peanut butter.</li>
+      <li>Drink water before each meal — it curbs how much rice or fried food you reach for.</li>
+      <li>Spread the ~3.6 L across the day rather than chugging it at once — your body absorbs it better, and steady hydration is what actually helps digest and use the protein in the dal/curd/paneer, not water in isolation.</li>
+    </ul>
+  </div>
+
+  <p class="note">Calories and protein are estimates from standard Indian-food references, not lab values — actual numbers shift with oil, ghee and portioning at your mess. Each day already carries a small buffer under 2,000 kcal; if you're still hungry, add rice or roti in ½-unit steps rather than an extra fried or sweet item.</p>
+
+</div>
+
+<script>
+const oats = { name:"Mid-Morning Protein Snack", items:"40 g Pintola Chocolate High-Protein Oats + 1 tbsp (15 g) MyFitness Chocolate Peanut Butter Crunchy, mixed with water", kcal:245, protein:14 };
+
+const weeks = [
+{
+  label: "Week 1",
+  sub: "applies on the 6th / 20th pattern",
+  days: [
+    { day:"Sunday", meals:[
+      {name:"Breakfast", items:"1 vada, ½ cup pongal, coconut chutney (small spoon), 1 glass milk", kcal:310, protein:12},
+      oats,
+      {name:"Lunch", items:"¾ cup veg biryani, ½ cup paneer tikka masala, 1 phulka, rasam, onion raita, 1 banana", kcal:680, protein:21},
+      {name:"Evening Snack", items:"6 pcs pani poori, tea", kcal:180, protein:4},
+      {name:"Dinner", items:"2 phulka, 1 cup dal, ⅓ cup rice, sambar, cabbage-beans poriyal", kcal:540, protein:20},
+    ]},
+    { day:"Monday", meals:[
+      {name:"Breakfast", items:"1 poori, ½ cup aloo masala, ⅓ cup mix veg upma, 1 glass milk", kcal:400, protein:12},
+      oats,
+      {name:"Lunch", items:"2 phulka, 1 cup dal ajwain, ½ cup rice, sambar, rasam, ½ cup kerai kothu (dry), buttermilk, watermelon", kcal:720, protein:26},
+      {name:"Evening Snack", items:"1 veg cutlet, tea", kcal:180, protein:4},
+      {name:"Dinner", items:"1 onion uttapam (small), 1 cup dal, ⅓ cup rice, sambar, rasam", kcal:520, protein:19},
+    ]},
+    { day:"Tuesday", meals:[
+      {name:"Breakfast", items:"2 idly, 1 mysore bonda, sambar, 1 glass milk", kcal:320, protein:12},
+      oats,
+      {name:"Lunch", items:"2 phulka, 1 cup dal thadka, ½ cup rice, sambar, rasam, 1 cup curd, muskmelon", kcal:670, protein:25},
+      {name:"Evening Snack", items:"1 veg samosa, imly sauce, tea", kcal:180, protein:4},
+      {name:"Dinner", items:"2 chapathi, 1 cup dal, ½ cup soya manchurian, sambar, mix veg poriyal", kcal:570, protein:27},
+    ]},
+    { day:"Wednesday", meals:[
+      {name:"Breakfast", items:"1 thin masala dosa, ⅓ cup poha, 1 glass milk", kcal:280, protein:10},
+      oats,
+      {name:"Lunch", items:"2 phulka, 1 cup dal punjabi, sambar, rasam, ½ cup paneer makhani, 1 banana", kcal:730, protein:29},
+      {name:"Evening Snack", items:"1 veg puff, tea", kcal:180, protein:4},
+      {name:"Dinner", items:"2 phulka, 1 cup rajma masala, ⅓ cup rice, rasam, ⅓ cup aloo-capsicum masala", kcal:560, protein:20},
+    ]},
+    { day:"Thursday", meals:[
+      {name:"Breakfast", items:"1 paneer paratha, buttermilk (instead of milk)", kcal:280, protein:9},
+      oats,
+      {name:"Lunch", items:"2 phulka, 1 cup green gram dal, ⅓ cup tamarind rice, sambar, rasam, ⅓ cup veg shahi masala, muskmelon", kcal:700, protein:24},
+      {name:"Evening Snack", items:"1 raw banana bajji, coconut chutney, tea", kcal:150, protein:3},
+      {name:"Dinner", items:"1 poori, 1 cup channa masala, sambar, poriyal, buttermilk", kcal:580, protein:22.5},
+    ]},
+    { day:"Friday", meals:[
+      {name:"Breakfast", items:"1 podi dosa, ½ cup pav bhaji, 1 glass milk", kcal:310, protein:11},
+      oats,
+      {name:"Lunch", items:"2 phulka, 1 cup dal rajasthani, ⅓ cup lemon rice, sambar, rasam, ⅓ cup palak paneer, watermelon", kcal:720, protein:26},
+      {name:"Evening Snack", items:"eggless cake (small slice), tea", kcal:150, protein:3},
+      {name:"Dinner", items:"2 phulka, 1 cup dal rajma, ⅓ cup rice, sambar, peanut chutney, snake gourd poriyal", kcal:540, protein:20},
+    ]},
+    { day:"Saturday", meals:[
+      {name:"Breakfast", items:"1 aloo-onion paratha, curd, 1 glass milk", kcal:330, protein:12},
+      oats,
+      {name:"Lunch", items:"2 phulka, 1 cup dal thadka, ½ cup curd rice, rasam, ⅓ cup keerai kootu, 1 banana, buttermilk", kcal:700, protein:26},
+      {name:"Evening Snack", items:"1 masala vada, chutney, tea", kcal:120, protein:4},
+      {name:"Dinner", items:"1 pulka + small plain dosa, 1 cup dal makhani, ⅓ cup rice, sambar, cabbage matar poriyal", kcal:600, protein:22},
+    ]},
+  ]
+},
+{
+  label: "Week 2",
+  sub: "applies on the 13th / 27th pattern",
+  days: [
+    { day:"Sunday", meals:[
+      {name:"Breakfast", items:"1 idly + 1 vada, ⅓ cup pav bhaji, 1 glass milk", kcal:270, protein:11.5},
+      oats,
+      {name:"Lunch", items:"¾ cup veg biryani, ⅓ cup paneer butter masala, 1 phulka, sambar, rasam, onion raita, 1 banana", kcal:710, protein:22},
+      {name:"Evening Snack", items:"dahi papdi chat (small), tea", kcal:150, protein:4},
+      {name:"Dinner", items:"2 phulka, 1 cup dal thoor, ⅓ cup rice, sambar, ½ cup soyabean-aloo gravy", kcal:610, protein:28},
+    ]},
+    { day:"Monday", meals:[
+      {name:"Breakfast", items:"1 poori, ½ cup chole masala, 1 glass milk", kcal:330, protein:14.5},
+      oats,
+      {name:"Lunch", items:"2 phulka, 1 cup dal fry, ⅓ cup tomato rice, sambar, rasam, ½ cup aloo drumstick, curd, papaya", kcal:770, protein:26},
+      {name:"Evening Snack", items:"masala peanuts (small handful), tea", kcal:150, protein:6},
+      {name:"Dinner", items:"1 methi roti + 1 kal dosa, 1 cup dal, sambar, ½ cup bindi do piazha", kcal:480, protein:19},
+    ]},
+    { day:"Tuesday", meals:[
+      {name:"Breakfast", items:"1 gobi paratha, curd, 1 glass milk", kcal:330, protein:13},
+      oats,
+      {name:"Lunch", items:"2 phulka, 1 cup dal thadka, ½ cup veg jal frizhi, ⅓ cup rice, sambar, rasam, watermelon, buttermilk", kcal:710, protein:25},
+      {name:"Evening Snack", items:"1 potato samosa, sauce, tea", kcal:180, protein:4},
+      {name:"Dinner", items:"2 phulka, 1 cup dal fry, ½ cup veg manchurian (semi dry), cabbage foguthe, curd", kcal:580, protein:26},
+    ]},
+    { day:"Wednesday", meals:[
+      {name:"Breakfast", items:"1 thin dosa, ⅓ cup namkin poha, 1 glass milk", kcal:280, protein:10},
+      oats,
+      {name:"Lunch", items:"2 phulka, ½ cup cabbage muttar, ½ cup paneer kadhai, sambar, rasam, ⅓ cup rice, 1 banana", kcal:670, protein:23},
+      {name:"Evening Snack", items:"1 veg puff, tea", kcal:180, protein:4},
+      {name:"Dinner", items:"2 chappathi, ½ cup veg kurma, ½ cup rava kitchadi, sambar, rasam, curd", kcal:620, protein:20},
+    ]},
+    { day:"Thursday", meals:[
+      {name:"Breakfast", items:"1 vada, ½ cup pongal, 1 glass milk", kcal:300, protein:11},
+      oats,
+      {name:"Lunch", items:"2 phulka, 1 cup dal masala, ⅓ cup ghee rice, sambar, rasam, ½ cup dingri mutter, muskmelon", kcal:730, protein:25},
+      {name:"Evening Snack", items:"half vada pav, tea", kcal:150, protein:4},
+      {name:"Dinner", items:"1 poori, ½ cup chole masala, ⅓ cup rice, cabbage poriyal, lassi", kcal:490, protein:16.5},
+    ]},
+    { day:"Friday", meals:[
+      {name:"Breakfast", items:"1 kal dosa, ½ cup namkeen poha, 1 glass milk", kcal:310, protein:11},
+      oats,
+      {name:"Lunch", items:"2 phulka, 1 cup dal lasoni, ⅓ cup rice, sambar, rasam, ½ cup matar paneer, watermelon", kcal:750, protein:29},
+      {name:"Evening Snack", items:"eggless cake/pasta (small), tea", kcal:150, protein:3},
+      {name:"Dinner", items:"2 phulka, 1 cup dal makhani, ½ cup beans-aloo poriyal, sambar, peanut chutney", kcal:500, protein:20},
+    ]},
+    { day:"Saturday", meals:[
+      {name:"Breakfast", items:"1 aloo paratha, curd, 1 glass milk", kcal:330, protein:12},
+      oats,
+      {name:"Lunch", items:"¾ cup veg biryani, ½ cup matar aloo gravy, ½ cup dal maharani, 1 phulka, rasam, papaya", kcal:710, protein:22},
+      {name:"Evening Snack", items:"sweet corn chat (small), tea", kcal:130, protein:4},
+      {name:"Dinner", items:"2 phulka, 1 cup dal rajma, 1 idly, sambar, curd, mixed veg gravy", kcal:580, protein:24.5},
+    ]},
+  ]
+}
+];
+
+// --- render ---
+const weekTabsEl = document.getElementById('weekTabs');
+const dayTabsEl = document.getElementById('dayTabs');
+const dayPanelEl = document.getElementById('dayPanel');
+let activeWeek = 0, activeDay = 0;
+
+function fmt(n){ return (Math.round(n*10)/10).toString(); }
+
+function renderWeekTabs(){
+  weekTabsEl.innerHTML = '';
+  weeks.forEach((w, i) => {
+    const b = document.createElement('button');
+    b.className = 'week-tab' + (i===activeWeek ? ' active' : '');
+    b.textContent = w.label;
+    b.onclick = () => { activeWeek = i; activeDay = 0; renderAll(); };
+    weekTabsEl.appendChild(b);
+  });
+}
+
+function renderDayTabs(){
+  dayTabsEl.innerHTML = '';
+  weeks[activeWeek].days.forEach((d, i) => {
+    const b = document.createElement('button');
+    b.className = 'day-tab' + (i===activeDay ? ' active' : '');
+    b.textContent = d.day;
+    b.onclick = () => { activeDay = i; renderDayPanel(); highlightDayTabs(); };
+    dayTabsEl.appendChild(b);
+  });
+}
+function highlightDayTabs(){
+  [...dayTabsEl.children].forEach((el, i) => el.classList.toggle('active', i===activeDay));
+}
+
+function renderDayPanel(){
+  const week = weeks[activeWeek];
+  const day = week.days[activeDay];
+  let kcal = 0, protein = 0;
+  const rows = day.meals.map(m => {
+    kcal += m.kcal; protein += m.protein;
+    return `<tr><td class="meal">${m.name}</td><td class="items">${m.items}</td><td class="num">${m.kcal}</td><td class="num">${fmt(m.protein)} g</td></tr>`;
+  }).join('');
+
+  dayPanelEl.innerHTML = `
+    <p class="sub" style="margin:0 0 12px;color:var(--ink-soft);font-size:13.5px;">${week.label} — ${day.day} (${week.sub})</p>
+    <div class="ledger-scroll">
+      <table class="ledger">
+        <thead><tr><th>Meal</th><th>What & how much</th><th class="num">kcal</th><th class="num">Protein</th></tr></thead>
+        <tbody>
+          ${rows}
+          <tr class="total"><td>Total</td><td></td><td class="num">${fmt(kcal)}</td><td class="num">${fmt(protein)} g</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="badge-row">
+      <span class="badge">${fmt(2000-kcal)} kcal under target</span>
+      <span class="badge">${fmt(protein-70)} g over protein floor</span>
+    </div>
+  `;
+}
+
+function renderAll(){
+  renderWeekTabs();
+  renderDayTabs();
+  renderDayPanel();
+}
+renderAll();
+
+// --- hydration tracker ---
+const BOTTLE_COUNT = 7;
+const bottleRow = document.getElementById('bottleRow');
+const bottleStatus = document.getElementById('bottleStatus');
+let filled = 0;
+const todayKey = new Date().toISOString().slice(0,10);
+try {
+  // bottle count resets automatically each new day
+  if (localStorage.getItem('bottlesDate') === todayKey) {
+    filled = Math.min(BOTTLE_COUNT, parseInt(localStorage.getItem('bottlesFilled') || '0', 10) || 0);
+  } else {
+    localStorage.setItem('bottlesDate', todayKey);
+    localStorage.setItem('bottlesFilled', '0');
+  }
+} catch(e) {}
+
+function renderBottles(){
+  bottleRow.innerHTML = '';
+  for (let i = 0; i < BOTTLE_COUNT; i++){
+    const b = document.createElement('div');
+    b.className = 'bottle' + (i < filled ? ' filled' : '');
+    b.onclick = () => {
+      filled = (i < filled && i === filled - 1) ? filled - 1 : i + 1;
+      try { localStorage.setItem('bottlesFilled', String(filled)); } catch(e) {}
+      renderBottles();
+    };
+    bottleRow.appendChild(b);
+  }
+  bottleStatus.textContent = `${filled} / ${BOTTLE_COUNT} bottles`;
+}
+renderBottles();
+
+document.getElementById('resetBottles').onclick = () => {
+  filled = 0;
+  try { localStorage.setItem('bottlesFilled', '0'); } catch(e) {}
+  renderBottles();
+};
+
+// --- theme toggle ---
+const themeBtn = document.getElementById('themeBtn');
+let theme = 'auto';
+try { theme = localStorage.getItem('theme') || 'auto'; } catch(e) {}
+if (theme !== 'auto') document.documentElement.setAttribute('data-theme', theme);
+themeBtn.onclick = () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : (current === 'light' ? null : 'dark');
+  if (next) { document.documentElement.setAttribute('data-theme', next); } else { document.documentElement.removeAttribute('data-theme'); }
+  try { localStorage.setItem('theme', next || 'auto'); } catch(e) {}
+};
+</script>
+</body>
+</html>
