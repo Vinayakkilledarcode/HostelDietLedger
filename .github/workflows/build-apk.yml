@@ -12,8 +12,12 @@ jobs:
           distribution: temurin
           java-version: 17
       - uses: android-actions/setup-android@v3
+      - name: Install SDK packages
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platforms;android-34" "build-tools;34.0.0"
       - run: chmod +x gradlew
-      - run: ./gradlew assembleDebug assembleRelease --no-daemon
+      - run: ./gradlew assembleDebug assembleRelease --no-daemon --stacktrace
       - uses: actions/upload-artifact@v4
         with:
           name: HostelDietLedger-apk

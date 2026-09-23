@@ -1,21 +1,28 @@
-# Hostel Diet Ledger — Android app
+# Hostel Diet Ledger
 
-WebView-wrapped diet ledger. Fully offline (fonts bundled), 7-bottle water tracker that resets daily.
+A personal project I built to keep my hostel-mess diet on track. The mess menu rotates on a two-week cycle, so I turned it into an offline Android app: every meal has calories and protein, every day has a total against my target, and a bottle tracker keeps me honest about water.
 
-## Build the APK — pick one
+## Features
+- Two-week rotating menu (Week 1 / Week 2, Sunday to Saturday)
+- Per-meal and per-day calorie and protein totals, with how far under the calorie target and over the protein floor each day lands
+- Daily water tracker (7 bottles, about 3.6 L) that resets automatically each day
+- My standing "running rules" for the mess (one fried item a day, small rice portions, water before meals)
+- Light and dark theme, follows the phone
+- Fully offline: fonts and data are bundled, no account, no tracking
 
-### A) Android Studio (Ladybug or newer, JDK 17+)
-1. File → Open → select this `HostelDietLedger` folder. Gradle wrapper is included, so sync works.
-2. Build → Build APK(s). Output: `app/build/outputs/apk/debug/app-debug.apk`
+## Tech
+- Android WebView shell (Java), single-page app in plain HTML, CSS and JavaScript (`app/src/main/assets/index.html`)
+- Data stored on-device with `localStorage`
+- Gradle 8.7, Android Gradle Plugin 8.3.2, min SDK 21, target SDK 34
+- GitHub Actions builds the APK on every push
 
-### B) Command line (JDK 17 + Android SDK)
-```
-./gradlew assembleDebug      # app/build/outputs/apk/debug/app-debug.apk
-./gradlew assembleRelease    # app/build/outputs/apk/release/app-release.apk (signed)
-```
+## Get the APK
+Push to `main`, open the **Actions** tab, open the latest **Build APK** run, and download the `HostelDietLedger-apk` artifact (`app-debug.apk` and a signed `app-release.apk`).
 
-### C) No setup — GitHub Actions
-Push this folder to a GitHub repo. Actions → "Build APK" → download the `HostelDietLedger-apk` artifact.
+Or build locally in Android Studio: open the folder, sync, then Build > Build APK(s).
 
-Release signing uses the bundled `app/release.keystore` (password `dietledger123`) — fine for sideloading;
-replace it before any Play Store upload.
+## Notes
+Calorie and protein numbers are estimates from standard Indian-food references, not lab values. The app is a personal planning aid, not medical or nutritional advice.
+
+## Author
+Vinayak Killedar (VK) - [github.com/Vinayakkilledarcode](https://github.com/Vinayakkilledarcode)
